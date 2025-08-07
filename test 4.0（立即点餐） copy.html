@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大宇小厨 - 吃得安心</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#8B0000', // 深红色作为主色调
+                        secondary: '#D2B48C', // 棕褐色作为辅助色
+                        accent: '#CD853F', // 秘鲁色作为强调色
+                        light: '#F5F5DC', // 米色作为浅色背景
+                        dark: '#3E2723', // 深棕色作为深色文本
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        serif: ['"Noto Serif SC"', 'serif'],
+                    },
+                }
+            }
+        }
+
+        
+    </script>
+
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            .transition-custom {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .hover-scale {
+                transition: transform 0.3s ease;
+            }
+            .hover-scale:hover {
+                transform: scale(1.03);
+            }
+            .card-shadow {
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            }
+            .btn-added {
+                background-color: #4CAF50 !important;
+                cursor: not-allowed;
+            }
+        }
+    </style>
+    <style>
+        #wishlistItemList .wishlist-item {
+            background: #f9f6f2;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(139,0,0,0.08);
+            margin-bottom: 8px;
+            padding: 12px 16px;
+            transition: box-shadow 0.2s;
+        }
+        #wishlistItemList .wishlist-item:hover {
+            box-shadow: 0 4px 16px rgba(139,0,0,0.15);
+        }
+        #wishlistItemList .wishlist-item img {
+            width: 56px;
+            height: 56px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid #D2B48C;
+        }
+        #wishlistItemList .wishlist-item h5 {
+            font-size: 1.1rem;
+            color: #8B0000;
+            font-weight: bold;
+        }
+        #wishlistItemList .wishlist-item p {
+            color: #b48b6c;
+            font-size: 0.95rem;
+        }
+        #wishlistItemList .remove-from-wishlist {
+            color: #b0b0b0;
+            font-size: 1.2rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        #wishlistItemList .remove-from-wishlist:hover {
+            color: #8B0000;
+        }
+    </style>
+</head>
+<body class="bg-light text-dark min-h-screen flex flex-col">
+    <!-- 导航栏 -->
+    <nav class="bg-primary text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-cutlery text-2xl"></i>
+                <h1 class="text-xl md:text-2xl font-serif font-bold">大宇小厨</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="#" class="hidden md:block hover:text-secondary transition-custom">首页</a>
+                <button id="hotRankBtn" class="hidden md:block hover:text-yellow-400 transition-custom font-bold text-lg"><i class="fa fa-fire text-yellow-400 mr-1"></i>热销榜单</button>
+                <a href="#" id="navFeedbackBtn" class="hidden md:block hover:text-secondary transition-custom">意见反馈</a>
+                <button id="cartBtn" class="relative bg-accent hover:bg-accent/90 px-4 py-2 rounded-md transition-custom">
+                    <i class="fa fa-shopping-cart"></i>
+                    <span id="cartCount" class="absolute -top-2 -right-2 bg-secondary text-primary text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                </button>
+                <button class="md:hidden text-xl" id="mobileMenuBtn">
+                    <i class="fa fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        <!-- 移动端菜单 -->
+        <div id="mobileMenu" class="hidden bg-primary/95 backdrop-blur-md md:hidden">
+            <div class="container mx-auto px-4 py-2 flex flex-col space-y-3">
+                <a href="#" class="py-2 hover:text-secondary transition-custom">首页</a>
+                <button id="hotRankBtnMobile" class="w-full text-left py-2 hover:text-yellow-400 transition-custom font-bold"><i class="fa fa-fire text-yellow-400 mr-1"></i>热销榜单</button>
+                <a href="#" class="py-2 hover:text-secondary transition-custom">意见反馈</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 英雄区域 -->
+    <header class="relative h-[50vh] md:h-[60vh] flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <img src="https://picsum.photos/id/42/1920/1080" alt="中餐厅环境" class="w-full h-full object-cover opacity-80">
+            <div class="absolute inset-0 bg-gradient-to-t from-primary/70 to-transparent"></div>
+        </div>
+        <div class="container mx-auto px-4 z-10 text-center">
+            <h2 class="text-[clamp(2rem,5vw,3.5rem)] font-serif font-bold text-white text-shadow mb-4">大宇小厨</h2>
+            <p class="text-[clamp(1rem,2vw,1.25rem)] text-white text-shadow max-w-2xl mx-auto mb-8">
+                为你提供健康、美味的工作餐，让您在忙碌的工作中享受家的味道
+            </p>
+            <button class="bg-accent hover:bg-accent/90 text-white px-6 py-3 rounded-md text-lg font-medium transition-custom shadow-lg">
+                立即点餐
+            </button>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <!-- 菜单分类 -->
+        <div class="mb-12">
+            <h3 class="text-2xl md:text-3xl font-serif font-bold text-primary mb-6 text-center">精选菜单</h3>
+            <div class="flex flex-wrap justify-center gap-3 mb-8">
+                <button class="menu-category-btn bg-primary text-white px-5 py-2 rounded-full transition-custom active">全部</button>
+                <button class="menu-category-btn bg-secondary text-dark px-5 py-2 rounded-full transition-custom hover:bg-primary hover:text-white">主荤</button>
+                <button class="menu-category-btn bg-secondary text-dark px-5 py-2 rounded-full transition-custom hover:bg-primary hover:text-white">半荤</button>
+                <button class="menu-category-btn bg-secondary text-dark px-5 py-2 rounded-full transition-custom hover:bg-primary hover:text-white">素菜</button>
+                <button class="menu-category-btn bg-secondary text-dark px-5 py-2 rounded-full transition-custom hover:bg-primary hover:text-white">主食</button>
+                <button class="menu-category-btn bg-secondary text-dark px-5 py-2 rounded-full transition-custom hover:bg-primary hover:text-white">汤羹</button>
+                <button class="menu-category-btn bg-secondary text-dark px-5 py-2 rounded-full transition-custom hover:bg-primary hover:text-white">糖水饮品</button>
+                <button class="menu-category-btn bg-secondary text-dark px-5 py-2 rounded-full transition-custom hover:bg-primary hover:text-white">特色餐</button>
+            </div>
+        </div>
+
+        <!-- 菜品列表 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" id="menuItems">
+            <!-- 菜品1 -->
+            <div class="bg-white rounded-xl overflow-hidden card-shadow hover-scale" data-id="1" data-name="宫保鸡丁" data-price="48" data-category="主荤">
+                <div class="relative h-52 overflow-hidden">
+                    <img src="https://picsum.photos/id/292/600/400" alt="宫保鸡丁" class="w-full h-full object-cover">
+                    <div class="absolute top-2 right-2 bg-primary text-white text-sm font-bold px-2 py-1 rounded">招牌</div>
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="text-xl font-serif font-bold text-dark menu-item-name cursor-pointer">宫保鸡丁</h4>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-2">原料：鸡肉、花生米、干辣椒、黄瓜</p>
+                    <p class="text-gray-600 mb-2">主荤</p>
+                    <div class="flex justify-between items-center">
+                        <button class="add-to-wishlist-btn bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-custom flex items-center" data-id="1" data-name="宫保鸡丁" data-price="48">
+                            <i class="fa fa-heart-o mr-1"></i> 加入心愿单
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 菜品2 -->
+            <div class="bg-white rounded-xl overflow-hidden card-shadow hover-scale" data-id="2" data-name="麻婆豆腐" data-price="28" data-category="半荤">
+                <div class="relative h-52 overflow-hidden">
+                    <img src="https://picsum.photos/id/488/600/400" alt="麻婆豆腐" class="w-full h-full object-cover">
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="text-xl font-serif font-bold text-dark menu-item-name cursor-pointer">麻婆豆腐</h4>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-2">原料：嫩豆腐、肉末、豆瓣酱、花椒</p>
+                    <p class="text-gray-600 mb-2">半荤</p>
+                    <div class="flex justify-between items-center">
+                        <button class="add-to-wishlist-btn bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-custom flex items-center" data-id="2" data-name="麻婆豆腐" data-price="28">
+                            <i class="fa fa-heart-o mr-1"></i> 加入心愿单
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 菜品3 -->
+            <div class="bg-white rounded-xl overflow-hidden card-shadow hover-scale" data-id="3" data-name="糖醋排骨" data-price="58" data-category="主荤">
+                <div class="relative h-52 overflow-hidden">
+                    <img src="https://picsum.photos/id/312/600/400" alt="糖醋排骨" class="w-full h-full object-cover">
+                    <div class="absolute top-2 right-2 bg-primary text-white text-sm font-bold px-2 py-1 rounded">招牌</div>
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="text-xl font-serif font-bold text-dark menu-item-name cursor-pointer">糖醋排骨</h4>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-2">原料：猪小排、番茄酱、白砂糖、白醋</p>
+                    <p class="text-gray-600 mb-2">主荤</p>
+                    <div class="flex justify-between items-center">
+                        <button class="add-to-wishlist-btn bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-custom flex items-center" data-id="3" data-name="糖醋排骨" data-price="58">
+                            <i class="fa fa-heart-o mr-1"></i> 加入心愿单
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- 素菜自动批量插入，每个菜品单独一个框 -->
+            <div class="bg-white rounded-xl overflow-hidden card-shadow hover-scale" data-id="1001" data-name="尖椒鸡蛋" data-price="18" data-category="素菜">
+                <img src="https://picsum.photos/seed/尖椒鸡蛋/400/240" alt="尖椒鸡蛋" class="w-full h-40 object-cover">
+                <div class="p-4">
+                    <h5 class="font-bold text-lg mb-2">尖椒鸡蛋</h5>
+                    <p class="text-gray-600 text-sm mb-2">原料：尖椒、鸡蛋</p>
+                    <p class="text-gray-600 mb-2">素菜</p>
+                    <div class="flex justify-between items-center">
+                        <button class="add-to-wishlist-btn bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-custom flex items-center" data-id="1001" data-name="尖椒鸡蛋" data-price="18" data-img="https://picsum.photos/seed/尖椒鸡蛋/400/240">
+                            <i class="fa fa-heart-o mr-1"></i> 加入心愿单
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl overflow-hidden card-shadow hover-scale" data-id="1002" data-name="青椒鸡蛋" data-price="16" data-category="素菜">
+                <img src="https://picsum.photos/seed/青椒鸡蛋/400/240" alt="青椒鸡蛋" class="w-full h-40 object-cover">
+                <div class="p-4">
+                    <h5 class="font-bold text-lg mb-2">青椒鸡蛋</h5>
+                    <p class="text-gray-600 text-sm mb-2">原料：青椒、鸡蛋</p>
+                    <p class="text-gray-600 mb-2">素菜</p>
+                    <div class="flex justify-between items-center">
+                        <button class="add-to-wishlist-btn bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-custom flex items-center" data-id="1002" data-name="青椒鸡蛋" data-price="16" data-img="https://picsum.photos/seed/青椒鸡蛋/400/240">
+                            <i class="fa fa-heart-o mr-1"></i> 加入心愿单
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl overflow-hidden card-shadow hover-scale" data-id="1003" data-name="苦瓜鸡蛋" data-price="20" data-category="素菜">
+                <img src="https://picsum.photos/seed/苦瓜鸡蛋/400/240" alt="苦瓜鸡蛋" class="w-full h-40 object-cover">
+                <div class="p-4">
+                    <h5 class="font-bold text-lg mb-2">苦瓜鸡蛋</h5>
+                    <p class="text-gray-600 text-sm mb-2">原料：苦瓜、鸡蛋</p>
+                    <p class="text-gray-600 mb-2">素菜</p>
+                    <div class="flex justify-between items-center">
+                        <button class="add-to-wishlist-btn bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-custom flex items-center" data-id="1003" data-name="苦瓜鸡蛋" data-price="20" data-img="https://picsum.photos/seed/苦瓜鸡蛋/400/240">
+                            <i class="fa fa-heart-o mr-1"></i> 加入心愿单
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl overflow-hidden card-shadow hover-scale" data-id="1004" data-name="西葫芦鸡蛋" data-price="19" data-category="素菜">
+                <img src="https://picsum.photos/seed/西葫芦鸡蛋/400/240" alt="西葫芦鸡蛋" class="w-full h-40 object-cover">
+                <div class="p-4">
+                    <h5 class="font-bold text-lg mb-2">西葫芦鸡蛋</h5>
+                    <p class="text-gray-600 text-sm mb-2">原料：西葫芦、鸡蛋</p>
+                    <p class="text-gray-600 mb-2">素菜</p>
+                    <div class="flex justify-between items-center">
+                        <button class="add-to-wishlist-btn bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-custom flex items-center" data-id="1004" data-name="西葫芦鸡蛋" data-price="19" data-img="https://picsum.photos/seed/西葫芦鸡蛋/400/240">
+                            <i class="fa fa-heart-o mr-1"></i> 加入心愿单
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl overflow-hidden card-shadow hover-scale" data-id="1005" data-name="韭菜鸡蛋" data-price="18" data-category="素菜">
+                <img src="https://picsum.photos/seed/韭菜鸡蛋/400/240" alt="韭菜鸡蛋" class="w-full h-40 object-cover">
+                <div class="p-4">
+                    <h5 class="font-bold text-lg mb-2">韭菜鸡蛋</h5>
+                    <p class="text-gray-600 text-sm mb-2">原料：韭菜、鸡蛋</p>
+                    <p class="text-gray-600 mb-2">素菜</p>
+                    <div class="flex justify-between items-center">
+                        <button class="add-to-wishlist-btn bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-custom flex items-center" data-id="1005" data-name="韭菜鸡蛋" data-price="18" data-img="https://picsum.photos/seed/韭菜鸡蛋/400/240">
+                            <i class="fa fa-heart-o mr-1"></i> 加入心愿单
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl overflow-hidden card-shadow hover-scale" data-id="1006" data-name="剁椒鸡蛋" data-price="21" data-category="素菜">
+                <img src="https://picsum.photos/seed/剁椒鸡蛋/400/240" alt="剁椒鸡蛋" class="w-full h-40 object-cover">
+                <div class="p-4">
+                    <h5 class="font-bold text-lg mb-2">剁椒鸡蛋</h5>
+                    <p class="text-gray-600 text-sm mb-2">原料：剁椒、鸡蛋</p>
+                    <p class="text-gray-600 mb-2">素菜</p>
+                    <div class="flex justify-between items-center">
+                        <button class="add-to-wishlist-btn bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-custom flex items-center" data-id="1006" data-name="剁椒鸡蛋" data-price="21" data-img="https://picsum.photos/seed/剁椒鸡蛋/400/240">
+                            <i class="fa fa-heart-o mr-1"></i> 加入心愿单
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl overflow-hidden card-shadow hover-scale" data-id="1007" data-name="胡萝卜鸡蛋" data-price="17" data-category="素菜">
+                <img src="https://picsum.photos/seed/胡萝卜鸡蛋/400/240" alt="胡萝卜鸡蛋" class="w-full h-40 object-cover">
+                <div class="p-4">
+                    <h5 class="font-bold text-lg mb-2">胡萝卜鸡蛋</h5>
+                    <p class="text-gray-600 text-sm mb-2">原料：胡萝卜、鸡蛋</p>
+                    <p class="text-gray-600 mb-2">素菜</p>
+                    <div class="flex justify-between items-center">
+                        <button class="add-to-wishlist-btn bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-custom flex items-center" data-id="1007" data-name="胡萝卜鸡蛋" data-price="17" data-img="https://picsum.photos/seed/胡萝卜鸡蛋/400/240">
+                            <i class="fa fa-heart-o mr-1"></i> 加入心愿单
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl overflow-hidden card-shadow hover-scale" data-id="1008" data-name="虾仁炒蛋" data-price="22" data-category="素菜">
+                <img src="https://picsum.photos/seed/虾仁炒蛋/400/240" alt="虾仁炒蛋" class="w-full h-40 object-cover">
+                <div class="p-4">
+                    <h5 class="font-bold text-lg mb-2">虾仁炒蛋</h5>
+                    <p class="text-gray-600 text-sm mb-2">原料：虾仁、鸡蛋</p>
+                    <p class="text-gray-600 mb-2">素菜</p>
+                    <div class="flex justify-between items-center">
+                        <button class="add-to-wishlist-btn bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-custom flex items-center" data-id="1008" data-name="虾仁炒蛋" data-price="22" data-img="https://picsum.photos/seed/虾仁炒蛋/400/240">
+                            <i class="fa fa-heart-o mr-1"></i> 加入心愿单
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl overflow-hidden card-shadow hover-scale" data-id="1009" data-name="平菇炒鸡蛋" data-price="19" data-category="素菜">
+                <img src="https://picsum.photos/seed/平菇炒鸡蛋/400/240" alt="平菇炒鸡蛋" class="w-full h-40 object-cover">
+                <div class="p-4">
+                    <h5 class="font-bold text-lg mb-2">平菇炒鸡蛋</h5>
+                    <p class="text-gray-600 text-sm mb-2">原料：平菇、鸡蛋</p>
+                    <p class="text-gray-600 mb-2">素菜</p>
+                    <div class="flex justify-between items-center">
+                        <button class="add-to-wishlist-btn bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-custom flex items-center" data-id="1009" data-name="平菇炒鸡蛋" data-price="19" data-img="https://picsum.photos/seed/平菇炒鸡蛋/400/240">
+                            <i class="fa fa-heart-o mr-1"></i> 加入心愿单
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl overflow-hidden card-shadow hover-scale" data-id="1010" data-name="洋葱炒鸡蛋" data-price="18" data-category="素菜">
+                <div class="relative h-52 overflow-hidden">
+                    <img src="https://picsum.photos/seed/洋葱炒鸡蛋/400/240" alt="洋葱炒鸡蛋" class="w-full h-full object-cover">
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="text-xl font-serif font-bold text-dark menu-item-name cursor-pointer">洋葱炒鸡蛋</h4>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-2">原料：洋葱、鸡蛋</p>
+                    <p class="text-gray-600 mb-2">素菜</p>
+                    <div class="flex justify-between items-center">
+                        <button class="add-to-wishlist-btn bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-custom flex items-center" data-id="1010" data-name="洋葱炒鸡蛋" data-price="18" data-img="https://picsum.photos/seed/洋葱炒鸡蛋/400/240">
+                            <i class="fa fa-heart-o mr-1"></i> 加入心愿单
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 菜品4 -->
+            <div class="bg-white rounded-xl overflow-hidden card-shadow hover-scale" data-id="4" data-name="凉拌黄瓜" data-price="16" data-category="素菜">
+                <div class="relative h-52 overflow-hidden">
+                    <img src="https://picsum.photos/id/1080/600/400" alt="凉拌黄瓜" class="w-full h-full object-cover">
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="text-xl font-serif font-bold text-dark menu-item-name cursor-pointer">凉拌黄瓜</h4>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-2">原料：黄瓜、蒜、生抽、香油</p>
+                    <p class="text-gray-600 mb-2">素菜</p>
+                    <div class="flex justify-between items-center">
+                        <button class="add-to-wishlist-btn bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-custom flex items-center" data-id="4" data-name="凉拌黄瓜" data-price="16">
+                            <i class="fa fa-heart-o mr-1"></i> 加入心愿单
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 菜品5 -->
+            <div class="bg-white rounded-xl overflow-hidden card-shadow hover-scale" data-id="5" data-name="扬州炒饭" data-price="32" data-category="主食">
+                <div class="relative h-52 overflow-hidden">
+                    <img src="https://picsum.photos/id/431/600/400" alt="扬州炒饭" class="w-full h-full object-cover">
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="text-xl font-serif font-bold text-dark menu-item-name cursor-pointer">扬州炒饭</h4>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-2">原料：米饭、火腿、鸡蛋、青豆</p>
+                    <p class="text-gray-600 mb-2">主食</p>
+                    <div class="flex justify-between items-center">
+                        <button class="add-to-wishlist-btn bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-custom flex items-center" data-id="5" data-name="扬州炒饭" data-price="32">
+                            <i class="fa fa-heart-o mr-1"></i> 加入心愿单
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+
+            <!-- 菜品6 -->
+            <div class="bg-white rounded-xl overflow-hidden card-shadow hover-scale" data-id="6" data-name="冬瓜排骨" data-price="42" data-category="汤羹">
+                <div class="relative h-52 overflow-hidden">
+                    <img src="https://picsum.photos/id/225/600/400" alt="冬瓜排骨汤" class="w-full h-full object-cover">
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="text-xl font-serif font-bold text-dark menu-item-name cursor-pointer">冬瓜排骨汤</h4>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-2">原料：冬瓜、排骨、姜片、葱段</p>
+                    <p class="text-gray-600 mb-2">汤羹</p>
+                    <div class="flex justify-between items-center">
+                        <button class="add-to-wishlist-btn bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-custom flex items-center" data-id="6" data-name="冬瓜排骨汤" data-price="42">
+                            <i class="fa fa-heart-o mr-1"></i> 加入心愿单
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- 热销榜单弹窗 -->
+    <div id="hotRankModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl w-full max-w-lg p-6 shadow-2xl relative animate__animated animate__fadeInDown" style="max-height:80vh;display:flex;flex-direction:column;">
+            <button id="closeHotRankModal" class="absolute top-4 right-4 text-gray-400 hover:text-primary text-2xl"><i class="fa fa-times"></i></button>
+            <h3 class="text-2xl md:text-3xl font-serif font-bold text-center mb-6" style="color:#d0011b;text-shadow:2px 2px 8px #ffd700;">
+                <i class="fa fa-trophy mr-2 text-yellow-400"></i>本月热销榜单
+            </h3>
+            <div class="overflow-y-auto" style="max-height:60vh;">
+                <!-- TOP1 -->
+                <div class="flex items-center mb-4 bg-gradient-to-r from-yellow-100 via-red-50 to-yellow-50 border-l-8 border-yellow-400 rounded-xl shadow p-4">
+                    <span class="bg-gradient-to-r from-red-500 to-yellow-400 text-white font-bold px-4 py-1 rounded-full text-lg shadow-lg mr-4 flex-shrink-0">TOP1</span>
+                    <img src="https://picsum.photos/id/292/80/56" alt="宫保鸡丁" class="rounded-lg border-2 border-yellow-400 shadow-md mr-4 w-20 h-14 object-cover flex-shrink-0">
+                    <div class="flex-1">
+                        <div class="text-lg font-serif font-bold text-primary">宫保鸡丁 <span class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs ml-2">主荤</span></div>
+                        <div class="text-base font-bold text-yellow-700 mt-1">心愿单次数：128</div>
+                    </div>
+                </div>
+                <!-- TOP2 -->
+                <div class="flex items-center mb-4 bg-gradient-to-r from-yellow-50 via-red-50 to-yellow-100 border-l-8 border-yellow-300 rounded-xl shadow p-4">
+                    <span class="bg-gradient-to-r from-red-400 to-yellow-300 text-white font-bold px-4 py-1 rounded-full text-lg shadow-lg mr-4 flex-shrink-0">TOP2</span>
+                    <img src="https://picsum.photos/id/312/80/56" alt="糖醋排骨" class="rounded-lg border-2 border-yellow-300 shadow-md mr-4 w-20 h-14 object-cover flex-shrink-0">
+                    <div class="flex-1">
+                        <div class="text-lg font-serif font-bold text-primary">糖醋排骨 <span class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs ml-2">主荤</span></div>
+                        <div class="text-base font-bold text-yellow-700 mt-1">心愿单次数：115</div>
+                    </div>
+                </div>
+                <!-- TOP3 -->
+                <div class="flex items-center mb-4 bg-gradient-to-r from-yellow-50 via-red-50 to-yellow-100 border-l-8 border-yellow-200 rounded-xl shadow p-4">
+                    <span class="bg-gradient-to-r from-red-300 to-yellow-200 text-white font-bold px-4 py-1 rounded-full text-lg shadow-lg mr-4 flex-shrink-0">TOP3</span>
+                    <img src="https://picsum.photos/id/488/80/56" alt="麻婆豆腐" class="rounded-lg border-2 border-yellow-200 shadow-md mr-4 w-20 h-14 object-cover flex-shrink-0">
+                    <div class="flex-1">
+                        <div class="text-lg font-serif font-bold text-primary">麻婆豆腐 <span class="bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full text-xs ml-2">半荤</span></div>
+                        <div class="text-base font-bold text-yellow-700 mt-1">心愿单次数：102</div>
+                    </div>
+                </div>
+                <!-- TOP4 -->
+                <div class="flex items-center mb-4 bg-white border-l-8 border-red-200 rounded-xl shadow p-4">
+                    <span class="bg-gradient-to-r from-green-400 to-yellow-200 text-white font-bold px-4 py-1 rounded-full text-lg shadow-lg mr-4 flex-shrink-0">TOP4</span>
+                    <img src="https://picsum.photos/seed/尖椒鸡蛋/80/56" alt="尖椒鸡蛋" class="rounded-lg border-2 border-red-200 shadow-md mr-4 w-20 h-14 object-cover flex-shrink-0">
+                    <div class="flex-1">
+                        <div class="text-lg font-serif font-bold text-primary">尖椒鸡蛋 <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs ml-2">素菜</span></div>
+                        <div class="text-base font-bold text-red-700 mt-1">心愿单次数：98</div>
+                    </div>
+                </div>
+                <!-- TOP5 -->
+                <div class="flex items-center mb-2 bg-white border-l-8 border-red-200 rounded-xl shadow p-4">
+                    <span class="bg-gradient-to-r from-green-400 to-yellow-200 text-white font-bold px-4 py-1 rounded-full text-lg shadow-lg mr-4 flex-shrink-0">TOP5</span>
+                    <img src="https://picsum.photos/seed/青椒鸡蛋/80/56" alt="青椒鸡蛋" class="rounded-lg border-2 border-red-200 shadow-md mr-4 w-20 h-14 object-cover flex-shrink-0">
+                    <div class="flex-1">
+                        <div class="text-lg font-serif font-bold text-primary">青椒鸡蛋 <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs ml-2">素菜</span></div>
+                        <div class="text-base font-bold text-red-700 mt-1">心愿单次数：91</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 购物车侧边栏 -->
+    <div id="cartSidebar" class="fixed top-0 right-0 h-full w-full md:w-96 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out z-50">
+        <div class="h-full flex flex-col">
+            <div class="p-4 bg-primary text-white flex justify-between items-center">
+                <h3 class="text-xl font-serif font-bold">我的心愿单</h3>
+                <button id="closeCartBtn" class="text-white hover:text-secondary transition-custom">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="cartItems" class="flex-grow p-4 overflow-y-auto">
+                <!-- 心愿单为空时显示 -->
+                <div id="emptyCart" class="flex flex-col items-center justify-center h-full">
+                    <i class="fa fa-heart-o text-gray-300 text-5xl mb-4"></i>
+                    <p class="text-gray-500">您的心愿单是空的</p>
+                    <p class="text-gray-400 text-sm mt-2">添加一些菜品到心愿单吧</p>
+                </div>
+                
+                <!-- 心愿单有商品时显示，初始隐藏 -->
+                <div id="wishlistItemList" class="hidden space-y-4">
+                    <!-- 心愿单商品项会通过JS动态添加 -->
+                </div>
+            </div>
+            <div class="p-4 border-t border-gray-200 bg-gray-50">
+                <button id="submitWishlistBtn" class="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-md transition-custom text-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    提交心愿单
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提交心愿单模态框 -->
+    <div id="orderModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl w-full max-w-md p-6 shadow-2xl transform transition-all">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-serif font-bold text-primary">提交心愿单</h3>
+                <button id="closeOrderModalBtn" class="text-gray-500 hover:text-primary transition-custom">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="mb-4">
+                <h4 class="font-medium mb-2">心愿单详情</h4>
+                <div id="orderDetails" class="bg-gray-50 p-3 rounded-md mb-3 max-h-40 overflow-y-auto">
+                    <!-- 心愿单详情会通过JS动态添加 -->
+                </div>
+            </div>
+            <div class="mb-4">
+                <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">备注</label>
+                <textarea id="notes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none" placeholder="有什么特殊要求？"></textarea>
+            </div>
+            <div class="mb-4">
+                <label for="wishNotes" class="block text-sm font-medium text-gray-700 mb-1">许愿文本</label>
+                <textarea id="wishNotes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none" placeholder="希望增加什么新菜品？有什么建议？"></textarea>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button id="cancelWishlistBtn" class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 transition-custom">
+                    取消
+                </button>
+                <button id="confirmWishlistBtn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-custom">
+                    确认提交
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提交成功模态框 -->
+    <div id="successModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl w-full max-w-md p-6 shadow-2xl text-center">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fa fa-check text-green-500 text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-serif font-bold text-dark mb-2">心愿单提交成功！</h3>
+            <p class="text-gray-600 mb-6">感谢您的反馈，我们会认真考虑您的需求！</p>
+            <button id="closeSuccessModalBtn" class="w-full bg-primary hover:bg-primary/90 text-white py-2 rounded-md transition-custom">
+                返回菜单
+            </button>
+        </div>
+    </div>
+
+    <!-- 意见反馈模态框 -->
+    <div id="feedbackModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl w-full max-w-md p-6 shadow-2xl transform transition-all">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-serif font-bold text-primary">意见反馈</h3>
+                <button id="closeFeedbackModalBtn" class="text-gray-500 hover:text-primary transition-custom">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="mb-4">
+                <label for="feedbackType" class="block text-sm font-medium text-gray-700 mb-1">反馈类型</label>
+                <select id="feedbackType" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    <option value="food">菜品建议</option>
+                    <option value="service">服务建议</option>
+                    <option value="environment">环境建议</option>
+                    <option value="other">其他建议</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label for="feedbackContent" class="block text-sm font-medium text-gray-700 mb-1">反馈内容</label>
+                <textarea id="feedbackContent" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none" placeholder="请详细描述您的建议或意见..."></textarea>
+            </div>
+            <div class="mb-4">
+                <label for="feedbackContact" class="block text-sm font-medium text-gray-700 mb-1">联系方式（选填）</label>
+                <input type="text" id="feedbackContact" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50" placeholder="您的姓名和部门">
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button id="cancelFeedbackBtn" class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100 transition-custom">
+                    取消
+                </button>
+                <button id="submitFeedbackBtn" class="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-custom">
+                    提交反馈
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h4 class="text-xl font-serif font-bold mb-4">大宇小厨</h4>
+                    <p class="text-gray-400 mb-4">为员工提供健康、美味的工作餐，让您在忙碌的工作中享受家的味道。</p>
+                    <div class="flex space-x-4">
+                        <button id="openFeedbackBtn" class="text-gray-400 hover:text-white transition-custom flex items-center">
+                            <i class="fa fa-commenting-o mr-1"></i> 提建议
+                        </button>
+                        <span id="openFeedbackText" class="cursor-pointer text-gray-400 hover:text-white transition-custom flex items-center">意见反馈</span>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-lg font-medium mb-4">供餐时间</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li>早餐: 8:30 - 9:00</li>
+                         <li>午餐: 12:30 - 13:30</li>
+                        <li>晚餐: 19:00 - 19:30</li>
+                        <li>（周三晚餐：18:30-19:00）</li>
+                               </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-medium mb-4">联系我们</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li class="flex items-start">
+                            <i class="fa fa-map-marker mt-1 mr-2"></i>
+                            <span>@Rennie 或 @Lily</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fa fa-envelope mr-2"></i>
+                            <span>hexinyi@dayuwuxain.com 或 liuli@dayuwuxian.com</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-500 text-sm">
+                <p>© 2025 大宇小厨 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 心愿单数据
+        let wishlist = [];
+        // 热销榜单弹窗相关
+        const hotRankBtn = document.getElementById('hotRankBtn');
+        const hotRankBtnMobile = document.getElementById('hotRankBtnMobile');
+        const hotRankModal = document.getElementById('hotRankModal');
+        const closeHotRankModal = document.getElementById('closeHotRankModal');
+
+        // DOM 元素
+        const cartBtn = document.getElementById('cartBtn');
+        const closeCartBtn = document.getElementById('closeCartBtn');
+        const cartSidebar = document.getElementById('cartSidebar');
+        const cartItems = document.getElementById('cartItems');
+        const emptyCart = document.getElementById('emptyCart');
+        const wishlistItemList = document.getElementById('wishlistItemList');
+        const cartCount = document.getElementById('cartCount');
+        const submitWishlistBtn = document.getElementById('submitWishlistBtn');
+        const orderModal = document.getElementById('orderModal');
+        const closeOrderModalBtn = document.getElementById('closeOrderModalBtn');
+        const cancelWishlistBtn = document.getElementById('cancelWishlistBtn');
+        const confirmWishlistBtn = document.getElementById('confirmWishlistBtn');
+        const orderDetails = document.getElementById('orderDetails');
+        const successModal = document.getElementById('successModal');
+        const closeSuccessModalBtn = document.getElementById('closeSuccessModalBtn');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuCategoryBtns = document.querySelectorAll('.menu-category-btn');
+        const menuItems = document.getElementById('menuItems');
+        const addToWishlistBtns = document.querySelectorAll('.add-to-wishlist-btn');
+        // 修复：确保 feedbackModal 全局可用
+        const feedbackModal = document.getElementById('feedbackModal');
+
+        // 初始化页面
+        function init() {
+            // 热销榜单弹窗事件
+            if (hotRankBtn && hotRankModal) {
+                hotRankBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    hotRankModal.classList.remove('hidden');
+                    document.body.classList.add('overflow-hidden');
+                });
+            }
+            if (hotRankBtnMobile && hotRankModal) {
+                hotRankBtnMobile.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    hotRankModal.classList.remove('hidden');
+                    document.body.classList.add('overflow-hidden');
+                });
+            }
+            if (closeHotRankModal && hotRankModal) {
+                closeHotRankModal.addEventListener('click', function() {
+                    hotRankModal.classList.add('hidden');
+                    document.body.classList.remove('overflow-hidden');
+                });
+            }
+            // 点击遮罩关闭弹窗
+            if (hotRankModal) {
+                hotRankModal.addEventListener('mousedown', function(e) {
+                    if (e.target === hotRankModal) {
+                        hotRankModal.classList.add('hidden');
+                        document.body.classList.remove('overflow-hidden');
+                    }
+                });
+            }
+            // 反馈弹窗相关按钮
+            const submitFeedbackBtn = document.getElementById('submitFeedbackBtn');
+            const cancelFeedbackBtn = document.getElementById('cancelFeedbackBtn');
+            const closeFeedbackModalBtn = document.getElementById('closeFeedbackModalBtn');
+            // 关闭弹窗
+            function closeFeedbackModal() {
+                feedbackModal.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+            if (cancelFeedbackBtn) {
+                cancelFeedbackBtn.addEventListener('click', closeFeedbackModal);
+            }
+            if (closeFeedbackModalBtn) {
+                closeFeedbackModalBtn.addEventListener('click', closeFeedbackModal);
+            }
+            // 提交反馈
+            if (submitFeedbackBtn) {
+                submitFeedbackBtn.addEventListener('click', function() {
+                    // 获取内容
+                    const type = document.getElementById('feedbackType')?.value || '';
+                    const content = document.getElementById('feedbackContent')?.value || '';
+                    const contact = document.getElementById('feedbackContact')?.value || '';
+                    // 简单校验
+                    if (!content.trim()) {
+                        alert('请填写反馈内容');
+                        return;
+                    }
+                    // 发送到后台（示例，实际需替换为你的API）
+                    fetch('/api/feedback', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ type, content, contact })
+                    }).then(() => {
+                        alert('反馈已提交，感谢您的建议！');
+                        closeFeedbackModal();
+                    }).catch(() => {
+                        alert('提交失败，请稍后再试');
+                    });
+                });
+            }
+            // 新增：点击右上角“意见反馈”弹出反馈模态框
+            const navFeedbackBtn = document.getElementById('navFeedbackBtn');
+            if (navFeedbackBtn && feedbackModal) {
+                navFeedbackBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    feedbackModal.classList.remove('hidden');
+                    document.body.classList.add('overflow-hidden');
+                });
+            }
+            // 新增：点击“意见反馈”文字弹出反馈模态框
+            const openFeedbackText = document.getElementById('openFeedbackText');
+            if (openFeedbackText && feedbackModal) {
+                openFeedbackText.addEventListener('click', function() {
+                    feedbackModal.classList.remove('hidden');
+                    document.body.classList.add('overflow-hidden');
+                });
+            }
+            // 事件监听器
+            cartBtn.addEventListener('click', toggleCart);
+            closeCartBtn.addEventListener('click', toggleCart);
+            // 新增：点击购物车栏外关闭购物车
+            document.addEventListener('mousedown', function(e) {
+                if (!cartSidebar.classList.contains('translate-x-full')) {
+                    // 判断点击是否在购物车栏外
+                    if (!cartSidebar.contains(e.target) && !cartBtn.contains(e.target)) {
+                        toggleCart();
+                    }
+                }
+            });
+            submitWishlistBtn.addEventListener('click', showOrderModal);
+            closeOrderModalBtn.addEventListener('click', hideOrderModal);
+            cancelWishlistBtn.addEventListener('click', hideOrderModal);
+            confirmWishlistBtn.addEventListener('click', confirmWishlist);
+            closeSuccessModalBtn.addEventListener('click', hideSuccessModal);
+            mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+            
+            // 菜单分类按钮事件
+            menuCategoryBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    menuCategoryBtns.forEach(b => {
+                        b.classList.remove('bg-primary', 'text-white');
+                        b.classList.add('bg-secondary', 'text-dark');
+                    });
+                    btn.classList.remove('bg-secondary', 'text-dark');
+                    btn.classList.add('bg-primary', 'text-white');
+                    
+                    const category = btn.textContent.trim();
+                    filterMenuItems(category);
+                });
+            });
+            
+            // 添加到心愿单按钮事件
+            addToWishlistBtns.forEach(btn => {
+                btn.addEventListener('click', addToWishlist);
+            });
+            
+            // 更新心愿单状态
+            updateWishlist();
+        }
+
+        // 切换购物车显示/隐藏
+        function toggleCart() {
+            cartSidebar.classList.toggle('translate-x-full');
+            document.body.classList.toggle('overflow-hidden');
+        }
+
+        // 切换移动端菜单显示/隐藏
+        function toggleMobileMenu() {
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        // 添加商品到心愿单
+        function addToWishlist(e) {
+            const btn = e.currentTarget;
+            const itemId = parseInt(btn.dataset.id);
+            const itemName = btn.dataset.name;
+            const itemPrice = parseFloat(btn.dataset.price);
+            // 检查商品是否已在心愿单中
+            const itemIndex = wishlist.findIndex(item => item.id === itemId);
+            if (btn.classList.contains('btn-added')) {
+                // 已加入状态，再点击则取消加入心愿单
+                removeFromWishlist(itemId);
+                showToast(`${itemName} 已从心愿单移除`);
+                return;
+            }
+            if (itemIndex === -1) {
+                // 商品不在心愿单中，添加新商品
+                wishlist.push({ id: itemId, name: itemName, price: itemPrice });
+                // 更新按钮状态
+                btn.classList.add('btn-added');
+                btn.innerHTML = '<i class="fa fa-heart mr-1"></i> 已加入';
+                // 显示成功提示
+                showToast(`${itemName} 已加入心愿单`);
+                // 更新心愿单
+                updateWishlist();
+                // 不再自动显示购物车栏
+                // if (cartSidebar.classList.contains('translate-x-full')) {
+                //     toggleCart();
+                // }
+            } else {
+                // 商品已在心愿单中
+                showToast(`${itemName} 已在心愿单中`);
+            }
+        }
+
+        // 从心愿单移除商品
+        function removeFromWishlist(id) {
+            const itemIndex = wishlist.findIndex(item => item.id === id);
+            
+            if (itemIndex > -1) {
+                // 从心愿单中移除商品
+                wishlist.splice(itemIndex, 1);
+                
+                // 重置按钮状态
+                const btn = document.querySelector(`.add-to-wishlist-btn[data-id="${id}"]`);
+                if (btn) {
+                    btn.classList.remove('btn-added');
+                    btn.innerHTML = '<i class="fa fa-heart-o mr-1"></i> 加入心愿单';
+                }
+                
+                // 更新心愿单
+                updateWishlist();
+            }
+        }
+
+        // 更新心愿单显示
+        function updateWishlist() {
+            // 更新心愿单项目
+            if (wishlist.length === 0) {
+                emptyCart.classList.remove('hidden');
+                wishlistItemList.classList.add('hidden');
+                submitWishlistBtn.disabled = true;
+            } else {
+                emptyCart.classList.add('hidden');
+                wishlistItemList.classList.remove('hidden');
+                submitWishlistBtn.disabled = false;
+                
+                // 清空心愿单列表
+                wishlistItemList.innerHTML = '';
+                
+                // 添加心愿单项目
+                wishlist.forEach(item => {
+                    const wishlistItem = document.createElement('div');
+                    wishlistItem.className = 'wishlist-item flex justify-between items-center p-3 border-b border-gray-100 last:border-0';
+                    wishlistItem.dataset.id = item.id;
+                    wishlistItem.innerHTML = `
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-gray-100 rounded-md overflow-hidden">
+                                <img src="https://picsum.photos/id/${100 + item.id}/100/100" alt="${item.name}" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <h5 class="font-medium">${item.name}</h5>
+                            </div>
+                        </div>
+                        <button class="remove-from-wishlist text-gray-400 hover:text-primary transition-custom">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    `;
+                    wishlistItemList.appendChild(wishlistItem);
+                });
+                
+                // 添加移除按钮事件监听器
+                document.querySelectorAll('.remove-from-wishlist').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const itemId = parseInt(this.closest('.wishlist-item').dataset.id);
+                        removeFromWishlist(itemId);
+                    });
+                });
+            }
+            
+            // 更新心愿单计数
+            cartCount.textContent = wishlist.length;
+        }
+
+        // 显示订单模态框
+        function showOrderModal() {
+            if (wishlist.length === 0) return;
+            
+            // 清空订单详情
+            orderDetails.innerHTML = '';
+            
+            // 添加订单项目
+            wishlist.forEach(item => {
+                const orderItem = document.createElement('div');
+                orderItem.className = 'flex justify-between mb-2';
+                orderItem.innerHTML = `
+                    <span>${item.name}</span>
+                `;
+                orderDetails.appendChild(orderItem);
+            });
+            
+            // 显示模态框
+            orderModal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        // 隐藏订单模态框
+        function hideOrderModal() {
+            orderModal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        // 显示成功模态框
+        function showSuccessModal() {
+            successModal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        // 隐藏成功模态框
+        function hideSuccessModal() {
+            successModal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+            
+            // 清空心愿单
+            wishlist = [];
+            
+            // 重置所有按钮状态
+            document.querySelectorAll('.add-to-wishlist-btn').forEach(btn => {
+                btn.classList.remove('btn-added');
+                btn.innerHTML = '<i class="fa fa-heart-o mr-1"></i> 加入心愿单';
+            });
+            
+            // 更新心愿单
+            updateWishlist();
+            
+            // 关闭购物车侧边栏
+            if (!cartSidebar.classList.contains('translate-x-full')) {
+                toggleCart();
+            }
+        }
+
+        // 确认提交心愿单
+        function confirmWishlist() {
+            // 这里可以添加提交心愿单的逻辑
+            // 例如发送AJAX请求到服务器
+            
+            // 显示成功模态框
+            showSuccessModal();
+            
+            // 隐藏订单模态框
+            hideOrderModal();
+        }
+
+        // 过滤菜单项目
+        function filterMenuItems(category) {
+            const menuItems = document.querySelectorAll('#menuItems > div');
+            // 隐藏所有价格
+            document.querySelectorAll('#menuItems .menu-item-price').forEach(p => {
+                p.classList.add('hidden');
+            });
+            menuItems.forEach(item => {
+                if (category === '全部' || item.dataset.category === category) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        }
+
+        // 显示提示消息
+        function showToast(message) {
+            // 创建toast元素
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-dark text-white px-4 py-2 rounded-md shadow-lg z-50 opacity-0 transition-opacity duration-300';
+            toast.textContent = message;
+            // 添加到页面
+            document.body.appendChild(toast);
+            // 显示toast
+            setTimeout(() => {
+                toast.classList.remove('opacity-0');
+                toast.classList.add('opacity-100');
+            }, 10);
+            // 2秒后自动消失
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+                setTimeout(() => {
+                    if (toast.parentNode) toast.parentNode.removeChild(toast);
+                }, 300);
+            }, 2000);
+        }
+
+        // 页面加载完成后初始化
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

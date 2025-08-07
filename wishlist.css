@@ -1,0 +1,94 @@
+/* 心愿单按钮样式 */
+.add-to-wishlist-btn {
+    transition: all 0.3s ease;
+}
+
+.add-to-wishlist-btn.added {
+    background-color: #4CAF50 !important;
+    cursor: not-allowed;
+}
+
+/* 购物车预览样式 */
+.cart-preview {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 280px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    display: none;
+    padding: 12px;
+}
+
+.preview-items {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.preview-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.preview-item img {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    object-fit: cover;
+    margin-right: 12px;
+}
+
+.preview-info {
+    flex: 1;
+}
+
+.preview-info span:first-child {
+    display: block;
+    font-weight: 500;
+}
+
+.preview-info span:last-child {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.remove-from-wishlist {
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.remove-from-wishlist:hover {
+    color: #ff4d4f;
+}
+
+.empty-preview {
+    text-align: center;
+    color: #999;
+    padding: 16px;
+}
+
+/* Toast消息样式 */
+.toast-message {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1001;
+}
+
+.toast-message.show {
+    opacity: 1;
+}
